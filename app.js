@@ -31,12 +31,12 @@ try {
 
   const port = process.env.PORT || 3000;
 
-  app.get("/", (req, re) => {
+  app.get("/", (req, res) => {
     res.sendStatus(200);
   });
 
   app.listen(port, () => {
-    console.log(`[server]: Server is running at https://localhost:${port}`);
+    console.log(`[server]: Server is running at http://localhost:${port}`);
   });
   // sequelize.close();
 } catch (error) {
