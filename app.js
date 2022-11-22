@@ -6,8 +6,7 @@ const helmet = require("helmet");
 const { Sequelize } = require("sequelize");
 dotenv.config();
 const config = require("./config");
-console.log("%c 🇪🇷: config ", "font-size:16px;background-color:#f02d26;color:white;", config)
-// const routes = require("./src/route");
+const routes = require("./src/routes");
 const app = express();
 try {
   const sequelize = new Sequelize(
@@ -19,12 +18,16 @@ try {
       dialect: config.MYSQL,
     }
   );
-  sequelize.authenticate();
-  console.info("Connection has been mysql successfully.");
+  try {
+    sequelize.authenticate();
+    console.info("Connection has been mysql successfully.");
+  } catch (error) {
+    console.error("Unable to connect to the database:", error);
+  }
   app.use(helmet());
   app.use(bodyParser.json());
   app.use(cors());
-//   routes(app);
+    routes(app);
 
   const port = process.env.PORT || 3000;
 
