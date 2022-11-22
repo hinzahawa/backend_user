@@ -57,8 +57,55 @@ async function register(req, res) {
     throw error;
   }
 }
+async function getUserByQuery(req, res) {
+  const query = querySerializer(req.query);
+  try {
+    let data = await UserModel.findAll({
+      ...query,
+    });
+    return res.json(data);
+  } catch (error) {
+    throw error;
+  }
+}
+async function updateUser(req, res) {
+  const userData = req.body;
+  try {
+    if (!userData.id) return res.status(400).json({ message: "id required." });
+    const isIdExists = await UserModel.findByPk(userData.id, {
+      attributes: ["id"],
+    });
+    if (!isIdExists) return res.status(422).json({ message: "id not found." });
+    const filter = { where: { id: userData.id } };
+    const [update] = await UserModel.update(userData, filter);
+    if (update > 0)
+      return res.json({ update, message: "updated successfully." });
+    else return res.status(422).json({ update, message: "updated nothing." });
+  } catch (error) {
+    throw error;
+  }
+}
+async function deleteUser(req, res) {
+  const { id } = req.query;
+  try {
+    if (!id) return res.status(400).json({ message: "id required." });
+    const isIdExists = await UserModel.findByPk(id, {
+      attributes: ["id"],
+    });
+    if (!isIdExists) return res.status(422).json({ message: "id not found." });
+    const filter = { where: { id } };
+    const result = await UserModel.destroy(filter);
+    if (result > 0)
+      return res.json({ result, message: "deleted successfully." });
+    else return res.status(422).json({ result, message: "deleted nothing." });
+  } catch (error) {
+    throw error;
+  }
+}
 router.post("/login", login);
 router.post("/", authorization, register);
-router.post("/", authorization, register);
+router.get("/", authorization, getUserByQuery);
+router.put("/", authorization, updateUser);
+router.delete("/", authorization, deleteUser);
 
 module.exports = router;
