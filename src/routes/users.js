@@ -15,7 +15,7 @@ async function login(req, res) {
     if (!password)
       return res.status(400).json({ message: "password required." });
     const query = querySerializer(req.body);
-    query.where.password = MD5(query.where.password ).toString();
+    query.where.password = MD5(query.where.password).toString();
     const isExistUser = await UserModel.findOne({
       ...query,
       attributes: ["id", "username"],
@@ -37,6 +37,15 @@ async function login(req, res) {
 async function register(req, res) {
   const userData = req.body;
   try {
+    if (!userData.username) {
+      return res.status(400).json({ message: "username required." });
+    }
+    const isExistUsername = await UserModel.findOne({
+      where: { username: userData.username },
+      attributes: ["id", "username"],
+    });
+    if (isExistUsername)
+      return res.status(422).json({ message: "username already exists." });
     if (userData.password)
       userData.password = MD5(userData.password).toString();
     const {
@@ -49,6 +58,7 @@ async function register(req, res) {
   }
 }
 router.post("/login", login);
-router.post("/register", authorization, register);
+router.post("/", authorization, register);
+router.post("/", authorization, register);
 
 module.exports = router;
