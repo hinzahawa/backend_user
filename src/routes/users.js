@@ -8,8 +8,14 @@ const authorization = require("../middleware/authorization");
 const MD5 = require("crypto-js/MD5");
 
 async function login(req, res) {
-  const query = querySerializer(req.body);
+  const { username, password } = req.body;
   try {
+    if (!username)
+      return res.status(400).json({ message: "username required." });
+    if (!password)
+      return res.status(400).json({ message: "password required." });
+    const query = querySerializer(req.body);
+    query.where.password = MD5(query.where.password ).toString();
     const isExistUser = await UserModel.findOne({
       ...query,
       attributes: ["id", "username"],
@@ -36,13 +42,13 @@ async function register(req, res) {
     const {
       dataValues: { id },
     } = await UserModel.create({ ...userData });
-    if (id) res.status(201).json({ message: "register successfully." });
-    else res.status(422).json({ message: "register failed." });
+    if (id) return res.status(201).json({ message: "register successfully." });
+    else return res.status(422).json({ message: "register failed." });
   } catch (error) {
     throw error;
   }
 }
 router.post("/login", login);
-router.post("/register", register);
+router.post("/register", authorization, register);
 
 module.exports = router;
