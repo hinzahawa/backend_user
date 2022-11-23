@@ -16,8 +16,8 @@ module.exports = (req, res, next) => {
         req.user = verifyToken;
         next();
       } catch (error) {
-        return res.status(422).json({
-          status: 422,
+        return res.status(401).json({
+          status: 401,
           error,
         });
       }
