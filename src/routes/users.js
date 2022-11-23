@@ -6,6 +6,7 @@ const { SECRET_KEY } = require("../../config");
 const jwt = require("jsonwebtoken");
 const authorization = require("../middleware/authorization");
 const MD5 = require("crypto-js/MD5");
+const { Op } = require("sequelize");
 
 async function login(req, res) {
   const { username, password } = req.body;
@@ -58,9 +59,13 @@ async function register(req, res) {
   }
 }
 async function getUserByQuery(req, res) {
-  const query = querySerializer(req.query);
+  let query = querySerializer(req.query);
   try {
-    let data = await UserModel.findAll({
+    if (Object.keys(query).length === 0) {
+      const userId = req.user.id;
+      query = { where: { id: { [Op.ne]: userId } } };
+    }
+    const data = await UserModel.findAll({
       ...query,
     });
     return res.json(data);
