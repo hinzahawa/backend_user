@@ -38,9 +38,8 @@ async function login(req, res) {
 async function register(req, res) {
   const userData = req.body;
   try {
-    if (!userData.username) {
+    if (!userData.username)
       return res.status(400).json({ message: "username required." });
-    }
     const isExistUsername = await UserModel.findOne({
       where: { username: userData.username },
       attributes: ["id", "username"],
@@ -81,10 +80,13 @@ async function updateUser(req, res) {
       attributes: ["id", "username"],
     });
     if (!isIdExists) return res.status(422).json({ message: "id not found." });
-    if (userData.username === isIdExists.dataValues.username)
-      return res.status(422).json({ message: "username already exists." });
+    // if (userData.username === isIdExists.dataValues.username)
+    //   return res.status(422).json({ message: "username already exists." });
     if (userData.password)
       userData.password = MD5(userData.password).toString();
+    if (userData.username) delete userData.username;
+    if (userData.createdAt) delete userData.createdAt;
+    if (userData.updatedAt) delete userData.updatedAt;
     const filter = { where: { id: userData.id } };
     const [update] = await UserModel.update(userData, filter);
     if (update > 0)
