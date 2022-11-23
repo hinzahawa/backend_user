@@ -73,9 +73,13 @@ async function updateUser(req, res) {
   try {
     if (!userData.id) return res.status(400).json({ message: "id required." });
     const isIdExists = await UserModel.findByPk(userData.id, {
-      attributes: ["id"],
+      attributes: ["id", "username"],
     });
     if (!isIdExists) return res.status(422).json({ message: "id not found." });
+    if (userData.username === isIdExists.dataValues.username)
+      return res.status(422).json({ message: "username already exists." });
+    if (userData.password)
+      userData.password = MD5(userData.password).toString();
     const filter = { where: { id: userData.id } };
     const [update] = await UserModel.update(userData, filter);
     if (update > 0)
