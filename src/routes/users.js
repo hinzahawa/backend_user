@@ -80,15 +80,14 @@ async function updateUser(req, res) {
       attributes: ["id", "username"],
     });
     if (!isIdExists) return res.status(422).json({ message: "id not found." });
-    // if (userData.username === isIdExists.dataValues.username)
-    //   return res.status(422).json({ message: "username already exists." });
     if (userData.password)
       userData.password = MD5(userData.password).toString();
     if (userData.username) delete userData.username;
     if (userData.createdAt) delete userData.createdAt;
     if (userData.updatedAt) delete userData.updatedAt;
     const filter = { where: { id: userData.id } };
-    const [update] = await UserModel.update(userData, filter);
+    delete userData.id 
+    const [update] = await UserModel.update({...userData}, filter);
     if (update > 0)
       return res.json({ update, message: "updated successfully." });
     else return res.status(422).json({ update, message: "updated nothing." });
