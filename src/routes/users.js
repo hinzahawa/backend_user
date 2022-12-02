@@ -51,7 +51,12 @@ async function register(req, res) {
     const {
       dataValues: { id },
     } = await UserModel.create({ ...userData });
-    if (id) return res.status(201).json({ message: "register successfully." });
+    if (id)
+      return res.status(201).json({
+        id,
+        username: userData.username,
+        message: "register successfully.",
+      });
     else return res.status(422).json({ message: "register failed." });
   } catch (error) {
     throw error;
@@ -86,8 +91,8 @@ async function updateUser(req, res) {
     if (userData.createdAt) delete userData.createdAt;
     if (userData.updatedAt) delete userData.updatedAt;
     const filter = { where: { id: userData.id } };
-    delete userData.id 
-    const [update] = await UserModel.update({...userData}, filter);
+    delete userData.id;
+    const [update] = await UserModel.update({ ...userData }, filter);
     if (update > 0)
       return res.json({ update, message: "updated successfully." });
     else return res.status(422).json({ update, message: "updated nothing." });
