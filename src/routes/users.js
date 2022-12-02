@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const UserModel = require("../models/users");
-const querySerializer = require("../helper/query_serializer");
+const querySerializer = require("../utils/query_serializer");
 const { SECRET_KEY } = require("../../config");
 const jwt = require("jsonwebtoken");
 const authorization = require("../middleware/authorization");
